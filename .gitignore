@@ -1,6 +1,7 @@
 # Project exclude paths
 /out/
+/.idea
+/.vscode
+
 a.txt
 output.txt
-.idea
-.vscode
