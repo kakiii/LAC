@@ -113,7 +113,7 @@ public class Main201521233 {
 		}
 
 		boolean haveAnchor = false, haveComb = false;
-		int start = 0, end = A.length - 1, num = 0, dist = 0, relativeHeight=0;
+		int start = 0, end = A.length - 1, num = 0, dist = 0;
 		for (int i = 0; i < A.length; i++) {
 			for (int j = A.length - 2; j > i; j--) {
 				if (!haveComb && (A[i] < A[i + 1] || A[j] < A[j + 1])) {
@@ -121,13 +121,13 @@ public class Main201521233 {
 				}
 				if (A[i] == A[j] && A[i] < A[i + 1] && A[j] < A[j + 1]) {
 					//System.out.println(i+" "+j);
-					if(!haveAnchor){
+					if (!haveAnchor) {
 						haveAnchor = true;
 						num = 2;
 					}
 					//System.out.println("dist= " +(j-i)+" "+(dist - 4)+ ", and relativeHeight=" + (A[i + 1] - A[i]));
-					if (dist <= j - i || (A[i + 1] - A[i] > relativeHeight && j-i>= dist - 2)) {
-						relativeHeight = A[i + 1] - A[i];
+					if (dist <= j - i) {
+
 						dist = j - i;
 						start = i;
 						end = j;
