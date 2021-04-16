@@ -125,12 +125,38 @@ public class Main201521233 {
 						haveAnchor = true;
 						num = 2;
 					}
-					//System.out.println("dist= " +(j-i)+" "+(dist - 4)+ ", and relativeHeight=" + (A[i + 1] - A[i]));
+					System.out.println("dist= " + (j - i >= dist - 4));
 					if (dist <= j - i) {
-
 						dist = j - i;
 						start = i;
 						end = j;
+					} else {
+						if (dist - 4 <= j - i && A[i] < A[start]) {
+							boolean findPeak = true, isPossible = true;
+							for (int k = i + 1; k < j + 2; k++) {
+								if (findPeak) {
+									if (A[k - 1] >= A[k]) {
+										isPossible = false;
+										break;
+									} else {
+										findPeak = false;
+									}
+								} else {
+									if (A[k - 1] <= A[k]) {
+										isPossible = false;
+										break;
+									} else {
+										findPeak = true;
+									}
+
+								}
+							}
+							if (isPossible) {
+								dist = j - i;
+								start = i;
+								end = j;
+							}
+						}
 					}
 				}
 			}
