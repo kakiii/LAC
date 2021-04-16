@@ -125,13 +125,13 @@ public class Main201521233 {
 						haveAnchor = true;
 						num = 2;
 					}
-					System.out.println("dist= " + (j - i >= dist - 4));
+					//System.out.println("dist= " + (j - i >= dist ));
 					if (dist <= j - i) {
 						dist = j - i;
 						start = i;
 						end = j;
 					} else {
-						if (dist - 4 <= j - i && A[i] < A[start]) {
+						if (dist - 4 <= j - i && A[j+1] < A[end]) {
 							boolean findPeak = true, isPossible = true;
 							for (int k = i + 1; k < j + 2; k++) {
 								if (findPeak) {
@@ -148,7 +148,6 @@ public class Main201521233 {
 									} else {
 										findPeak = true;
 									}
-
 								}
 							}
 							if (isPossible) {
@@ -165,7 +164,7 @@ public class Main201521233 {
 			return haveComb ? 1 : 0;
 		} else {
 			int length = end - start - 2;
-			System.out.println("Start with A["+start + "] = " +A[start]+", to A[" + end+"] = "+A[end]);
+			System.out.println("Start with A[" + start + "] = " + A[start] + ", to A[" + end + "] = " + A[end]);
 			int[] croppedInput = new int[length];
 			System.arraycopy(A, start + 2, croppedInput, 0, length);
 			int lastPeak = A[start + 1];
@@ -197,7 +196,6 @@ public class Main201521233 {
 						//System.out.println(bestVal);
 					}
 					bestVal = Math.max(bestVal, dp[j][i]);
-
 					// if (dp[j][i]==1&&i-j==1) System.out.println(j+" "+i);
 					//System.out.println("dp[" + j + "][" + i + "]= " + dp[j][i]);
 				}
