@@ -70,7 +70,7 @@ public class Main201521233 {
 		 * In a tooth there are two numbers, say A[i] and A[i+1] with the property of
 		 * A[i] < A[i+1], and we call the first number, A[i], as "valley", and the last name being "peak".
 		 *
-		 * 		 *
+		 *
 		 * recursive code for this problem:
 		 *
 		 * start <- 0
@@ -90,12 +90,17 @@ public class Main201521233 {
 		 * 					return 1
 		 * 				else return 0
 		 * else:
-		 * 		return  max{longestComb(start,start+1,lastPeak)+longestComb(start+1,end,lastPeak),
-		 * 				longestComb(start,start+2,lastPeak)+longestComb(start+2,end,lastPeak),
+		 * 		return  max{longestComb(start,start,lastPeak)+longestComb(start+1,end,lastPeak),
+		 * 				longestComb(start,start+1,lastPeak)+longestComb(start+2,end,lastPeak),
 		 * 				......
-		 * 				longestComb(start,end-1,lastPeak)+longestComb(end-1,end,lastPeak),}
+		 * 				longestComb(start,end-1,lastPeak)+longestComb(end,end,lastPeak),}
 		 *
-		 *	if lastPeak < valley of
+		 *	In dynamic programming, this recursive function is replaced by a n*n array, named dp,
+		 * 	where n represents the length of croppedInput.
+		 * 	That is to say, if dp[a][b] represents the longest comb between a and b(b >= a, both a and b included),
+		 * 	and b-a>1, then dp[a][b] = max{dp[a][a]+dp[a+1][b], dp[a][a+2]+dp[a+3][b]..., dp[a][b-1]+dp[b][b]}.
+		 *
+		 *
 		 *
 		 *
 		 */
@@ -105,20 +110,34 @@ public class Main201521233 {
 		 * your implementation: describe how the running time depends on n (length of
 		 * the input sequence), and give short argument.
 		 *
-		 * ..... .....
+		 * To find the correct pair of anchors, there are 3 nested loops of which the times are all related to the length
+		 * of input array, so the worst case is O(n^3).
+		 * To find the longest comb between the pair of anchors(if there is), there are 3 nest loops, whose times can be n at worse too, so it will still be O(n^3).
+		 * Since these two steps are separated, so the time complexity of my algorithm is O(n^3).
+		 *
 		 */
-
+		// if input is empty
 		if (n == 0) {
 			return 0;
 		}
-
+		// haveAnchor: whether we have found the anchor
+		// haveComb: whether we have found a comb
 		boolean haveAnchor = false, haveComb = false;
+		// start and end limits where the potential longest comb lies in
+		// num is the final result we will return
+		// dist is the distance of valleys of anchor
 		int start = 0, end = A.length - 1, num = 0, dist = 0;
+		// start from both sides, a greedy-like algorithm.
 		for (int i = 0; i < A.length; i++) {
 			for (int j = A.length - 2; j > i; j--) {
+				// if there is a pair of data such that the former is smaller than the latter,
+				// and we have not found a comb,
+				// then we set haveComb to true
 				if (!haveComb && (A[i] < A[i + 1] || A[j] < A[j + 1])) {
 					haveComb = true;
 				}
+				// if there are two pairs of value and they have the same value of valley,
+				// then we set haveAnchor to true
 				if (A[i] == A[j] && A[i] < A[i + 1] && A[j] < A[j + 1]) {
 					//System.out.println(i+" "+j);
 					if (!haveAnchor) {
@@ -126,16 +145,22 @@ public class Main201521233 {
 						num = 2;
 					}
 					//System.out.println("dist= " + (j - i >= dist ));
+					// the greedy part for computing dist(ance)
+					// if the distance between two anchors is bigger, then we substitute anchor to this one
 					if (dist <= j - i) {
 						dist = j - i;
 						start = i;
 						end = j;
 					} else {
-						if (dist - 4 <= j - i && A[j+1] < A[end]) {
+						// but if it is smaller, it is still possible, as long as the inside are all teeth
+						if (dist - 4 <= j - i && A[j + 1] < A[end]) {
+							// findPeak to switch between finding valley and peak alternately
 							boolean findPeak = true, isPossible = true;
 							for (int k = i + 1; k < j + 2; k++) {
 								if (findPeak) {
 									if (A[k - 1] >= A[k]) {
+										// if there is one pair such that they are not a tooth
+										// then it is impossible
 										isPossible = false;
 										break;
 									} else {
@@ -150,6 +175,7 @@ public class Main201521233 {
 									}
 								}
 							}
+							// if it if possible then we substitute as well
 							if (isPossible) {
 								dist = j - i;
 								start = i;
@@ -159,48 +185,69 @@ public class Main201521233 {
 					}
 				}
 			}
+			// end greedy part for finding anchor
 		}
+		// if there is not anchor, we return 0 or 1 according to the value of haveComb
 		if (!haveAnchor) {
 			return haveComb ? 1 : 0;
 		} else {
+			// otherwise we enter the DP part
 			int length = end - start - 2;
-			System.out.println("Start with A[" + start + "] = " + A[start] + ", to A[" + end + "] = " + A[end]);
+			// System.out.println("Start with A[" + start + "] = " + A[start] + ", to A[" + end + "] = " + A[end]);
+			// croppedInput stores where the potential longest comb lies in
 			int[] croppedInput = new int[length];
+			// could be faster with Java Stream, but libraries are not allowed
 			System.arraycopy(A, start + 2, croppedInput, 0, length);
+			// lastPeak stands for the last bigger number in the last potential tooth
 			int lastPeak = A[start + 1];
 			System.out.println(Arrays.toString(croppedInput));
 			int[][] dp = new int[length][length];
+			// findFirstPeak means whether we find the first tooth between the anchors.
 			boolean findFirstPeak = true;
 			int bestVal = 0;
-
+			// i starts with the left side, and j starts from i to the opposite direction
+			// dp[a][b] stands for the potential number of tooth from a to b (both ends included)
 			for (int i = 0; i < dp.length; i++) {
 				for (int j = i; j >= 0; j--) {
+					// if i = j, there is one number, obviously 0
 					if (i == j) dp[j][i] = 0;
+						// if i and j are neighbours, there could be 1, which is a base case
 					else if (i - j == 1) {
+						// if the former is less than the latter
 						if (croppedInput[j] < croppedInput[i]) {
 							//System.out.println("first peak is "+lastPeak+" and A["+j+"] is "+A[j]);
+							// and we have not found a tooth, we need to consider the relationship with this valley
+							// and the peak of the left anchor.
 							if (findFirstPeak) {
+								// if we find one and this is the first one, dp[i][j] shall be 1 and findFirstPeak is done.
 								if (croppedInput[j] < A[start + 1]) {
 									dp[j][i] = 1;
 									findFirstPeak = false;
 								} else {
+									// otherwise we continue to find the first peak
 									dp[j][i] = 0;
 								}
-							} else dp[j][i] = croppedInput[j] < lastPeak ? 1 : 0;
+							} else
+								// if this is not the first tooth, we do not need to consider that relationship mentioned above
+								dp[j][i] = croppedInput[j] < lastPeak ? 1 : 0;
+							// whether this is a tooth satisfies our requirement or not, we always update the value of lastPeak
 							lastPeak = croppedInput[i];
 						}
 					} else {
+						// core DP algorithm
 						for (int k = j; k < i; k++) {
 							dp[j][i] = Math.max(dp[j][k] + dp[k + 1][i], dp[j][i]);
 						}
 						//System.out.println(bestVal);
 					}
+					// update bestVal
 					bestVal = Math.max(bestVal, dp[j][i]);
 					// if (dp[j][i]==1&&i-j==1) System.out.println(j+" "+i);
 					//System.out.println("dp[" + j + "][" + i + "]= " + dp[j][i]);
+
 				}
 			}
-
+			// consider the relationship of last teeth and right anchor
 			if (lastPeak < A[end]) bestVal--;
 			num += bestVal;
 
@@ -273,7 +320,7 @@ public class Main201521233 {
 			ArrayList<Integer> Wrong = new ArrayList<Integer>();
 			for (int t = 0; t < Nins; t++) {
 				ArrayList<Integer> Instance = AIS.get(t);
-				System.out.println("Input array " + (t + 1) + " is: " + Instance.subList(2, Instance.size()));
+				System.out.println("Input array " + (t+1) + " is: " + Instance.subList(2, Instance.size()));
 				Result = Computation(Instance, opt);
 				// System.out.println(Result);
 
