@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Main201521233 {
+public class Main {
 
 	public static ArrayList<String> ReadData(String pathname) {
 		ArrayList<String> strlist = new ArrayList<String>();

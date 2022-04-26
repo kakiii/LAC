@@ -3,7 +3,7 @@ import java.util.Arrays;
 public class test {
 
 	public static int LSC(int[] A, int n) {
-		return Main201521233.LongestComb(A, n);
+		return Main.LongestComb(A, n);
 
 	}
 
